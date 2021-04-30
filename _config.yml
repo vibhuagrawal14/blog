@@ -2,7 +2,7 @@
 title:          Blog
 description:    "Vibhu Agrawal's personal blog"
 baseurl:        "/blog"
-url:            "https://vibhuagrawal.com"
+url:            "vibhuagrawal.com"
 
 # Google Analytics
 google_analytics: UA—XXXXXXXX-X
@@ -25,8 +25,8 @@ plugins:
   # - jemoji #Uncomment this to allow emoji in your post
 
 # Permalinks
-permalink:      /:year-:month-:day/:title
-paginate:       5
+permalink:      /:title
+paginate:       10
 
 # Excludes
 exclude: [ Gemfile, Gemfile.lock, tale.gemspec ]
