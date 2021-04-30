@@ -4,6 +4,9 @@ description:    "Vibhu Agrawal's personal blog"
 baseurl:        "/blog"
 url:            "vibhuagrawal.com"
 
+author:
+  name:       Vibhu Agrawal
+
 # Google Analytics
 google_analytics: UA—XXXXXXXX-X
 
