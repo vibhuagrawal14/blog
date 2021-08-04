@@ -6,16 +6,16 @@ author: "Vibhu"
 comments: false
 ---
 
-Say you have a list of locations with latitude and longitude information, and you want to query this data for nearest-neighbors. Maybe you want to find all restaurants in a 10 km radius. Or maybe you are advertising a job opening for New York but you want to publish it to nearby cities as well. Or maybe you want to ____.
+Say you have a list of locations with their corresponding latitudes and longitudes, and you want to put this data to use. Maybe you are a food delivery service that wants to find all Korean restaurants in a 10 kilometer radius. Or maybe you are advertising a job opening in New York but you want to publish it to nearby cities as well. Or maybe you are a dating app that wants to calculate the distance between potential matches to an absurd degree of accuracy.[^1]
 
 
 While it is very tempting to use the latitude/longitude data as coordinates in a 2-D space and use the L2-norm to compute the "distance" between two locations, the approach fails due to three reasons:
 
 1. **The earth is not flat**: While it is reasonable to consider the Earth to be flat for short distances, its curvature causes noticeable errors in any distance measurements over a few kilometers.  
-2. **Equal distances in the geo-coordinate space may or may not be equal in real life**: The distance required to move 1&deg; along the equator is much larger than the distance required to move 1&deg; near the North Pole due to the curvature of the earth  (*Figure 1*). This makes querying for nearest-neighbors unreliable as some points that may appear to be far away in latitude/longitude coordinate space may actually be closer in real life.
+2. **Equal distances in the geo-coordinate space may or may not be equal in the physical world**: The distance required to move 1&deg; along the equator is much larger than the distance required to move 1&deg; near the North Pole due to the curvature of the earth  (*Figure 1*). This makes querying for nearest-neighbors unreliable as some points that may appear to be far away in latitude/longitude coordinate space may actually be closer in real life.
 3. **Latitude/longitude are not continuous at the boundaries of the geo-coordinate space**: Latitude/longitude values _jump_ at the prime meridian from +180&deg; to -180&deg; resulting in wrong distance calculations. Similar problems are faced at the North and South Poles where "stepping-over" the poles results in wildly different longitude values.
 
-In this article, we look at a method to compute the distance between two points on the surface of the Earth and extend it to query a geospatial dataset for nearest neighbors.
+<mark style="background-color: lightpink">In this article, we look at a method to compute the distance between two points on the surface of the Earth and extend it to query a geospatial dataset for nearest neighbors.</mark>
 
 &nbsp;
 
@@ -27,7 +27,7 @@ In this article, we look at a method to compute the distance between two points 
 
 ## A better distance function
 
-><a id="#note_1" style="color: inherit;">**Note 1:**</a> A key assumption here onwards is that the Earth is spherical in shape, which is not strictly true as the Earth's shape is closer to an ellipsoid with the radius of curvature at the equator being ≈6378 km and that at the poles being ≈6357 km. Because the difference in the radius is not large, the error is generally small enough to be safely ignored.
+<a id="#note_1" style="color: inherit;">**Note 1:**</a> A key assumption here onwards is that the Earth is spherical in shape, which is not strictly true as the Earth's shape is closer to an ellipsoid with the radius of curvature at the equator being ≈6378 km and that at the poles being ≈6357 km. Because the difference in the radius is not large, the error is generally small enough to be safely ignored.
 
 The shortest distance between any two points on a sphere is the distance between the two points along the great circle passing through both the points. A great circle is a circle drawn on a sphere with the same radius as the sphere, and centred at the centre of the sphere. Of the infinitely many great circles possible, we are now concerned with the one that passes through the two points in question. 
 
@@ -37,14 +37,18 @@ $$\begin{equation}
 \theta = \frac{d}{r} \tag{1}\label{eq:1}
 \end{equation}$$
 
-where $$d$$ is the distance between the two points along the great circle, and $$r$$ is the radius of the sphere. Because we already know the mean radius of the Earth (6371008.7714 m), in order to find the value of $$d$$, we need to compute $$\theta$$. 
+where $$d$$ is the distance between the two points along the great circle, and $$r$$ is the radius of the sphere. Because we already know the mean radius of the Earth (6371008.7714 m[^2]), in order to find the value of $$d$$, we need to compute $$\theta$$. 
 
 &nbsp;
 
-![Haversine derivation 2]({{site.baseurl}}/assets/images/haversine_derivation_2.png)
-*Figure 2. Let points A and B be two points on the surface of the Earth with latitudes $$\phi_1$$ and $$\phi_2$$ and longitudes $$\lambda_1$$ and $$\lambda_2$$ respectively, and let C be the North Pole. a, b, and c are the lengths of the arcs created by BC, AC and AB respectively on the surface of the sphere.*
+Let's put this knowledge to use.  
+  
+Let points A and B be two points on the surface of the Earth with latitudes $$\phi_1$$ and $$\phi_2$$ and longitudes $$\lambda_1$$ and $$\lambda_2$$ respectively, and let C be the North Pole. a, b, and c are the lengths of the arcs created by BC, AC and AB respectively on the surface of the sphere. (Figure 2)
 
-If we consider the sphere in *Figure 2* to be of unit radius, then using $$eq. \eqref{eq:1}$$, the $$\angle AOB$$ is the same same as $$c$$, $$\angle AOC$$ is the same same as $$b$$, and $$\angle BOC$$ is the same same as $$a$$.
+![Haversine derivation 2]({{site.baseurl}}/assets/images/haversine_derivation_2.png)
+*Figure 2. A, B, and C are three points on the Earth's surface, and O is the center of the Earth.*
+
+If we consider the sphere in *Figure 2* to be of unit radius, then using $$eq. \eqref{eq:1}$$, the $$\angle AOB$$ is the same as $$c$$, $$\angle AOC$$ is the same as $$b$$, and $$\angle BOC$$ is the same as $$a$$.
 
 Now, we have $$c = \theta$$, $$b = \frac{\pi}{2} - \phi_1$$, $$a = \frac{\pi}{2} - \phi_2$$, and $$C = \lambda_2 - \lambda_1 $$.  
  
@@ -86,6 +90,8 @@ $$\begin{equation}
 \end{equation}$$
 </div>
 
+&nbsp;
+  
 This formula has been around for a long time, but it is cumbersome to use without a calculator. It requires multiple trignometric lookups, calculating squares, and even a square root. To simplify the calculations, we use a lesser known trignometric function *haversine*, which is defined as:  
   
 <div style="overflow-x: scroll">
@@ -102,7 +108,7 @@ $$\begin{equation}
 \end{equation}$$
 </div>
 
-In the past few hundred years, the Haversine formula has been used extensively by sailors in planning their voyages.[^1] Instead of multiple difficult operations required by $$eq.\eqref{eq:2}$$, this formula makes it really simple to perform the calculation by requiring only a few lookups in the haversine table.
+In the past few hundred years, the Haversine formula has been used extensively by sailors in planning their voyages.[^3] Instead of multiple difficult operations required by $$eq.\eqref{eq:2}$$, this formula makes it really simple to perform the calculation by requiring only a few lookups in the haversine table.
 
 &nbsp;
 
@@ -181,15 +187,19 @@ Now that we have a reliable distance metric in place, let's shift our focus to q
 1. finding $$k$$ nearest neighbors (kNN) of a given point, and
 2. finding all neighbors in radius $$r$$ around a given point
 
-<h4 style="margin-block-end:0.33em"> The brute-force method </h4>
-The most obvious way to perform queries of these types over $$D$$-dimensional data is the brute force approach. For any given point, we simply iterate over all other points in our dataset and compute each point's distance from the given query point. Under the standard assumption that the query point may not be present in the dataset, the brute-force approach has $$O(D.N)$$ time complexity. Iterating over all data points for a query is very computationally expensive, especially if the size of the data is large. To speed up the query mechanism, we now look into preprocessing algorithms that can take advantage of its inherent structure.
+&nbsp;
+
+<h3 style="margin-block-end:0.33em"> The brute-force method </h3>
+The most obvious way to perform queries of these types is the brute force approach. For any given point, we simply iterate over all other points in our dataset and compute each point's distance from the given query point. Under the standard assumption that the query point may not be present in the dataset, the brute-force approach has $$O(D.N)$$ (where D is the dimensionality of the data, which in our case is 2) time complexity. Iterating over all data points for a query is very computationally expensive, especially if the size of the data is large. To speed up the query mechanism, we now look into preprocessing algorithms that can take advantage of its inherent structure.
 
 <!-- To find $$k$$ nearest neighbors, we can either sort all points based on their distance from the given point ($$O(N\log(N))$$ time complexity) and take the select the first $$k$$ points, or we can use an algorithm like [quickselect](https://en.wikipedia.org/wiki/Quickselect) to select $$k$$ smallest elements ($$O(N)$$ average time complexity, $$O(N^2)$$ worst-case time complexity). If we have to perform multiple queries, it is more efficient to precompute the distances between every two points at the cost of extra space ($$O(N^2)$$ space and time complexity) and sort the list of points for each point based on the distance. This enables look-up during runtime at $$O(\log(N))$$ time complexity.   -->
-  
-<h4 style="margin-block-end:0.33em">The (problematic) k-d Tree </h4>
+
+&nbsp;
+
+<h3 style="margin-block-end:0.33em">The (problematic) k-d Tree </h3>
 A standard approach to optimize the brute-force approach is to use a specialized tree data structure called a [k-d tree](https://en.wikipedia.org/wiki/K-d_tree). A k-d tree, or a k-dimensional tree, is a binary tree which recursively splits the space into two by building [hyperplanes](https://en.wikipedia.org/wiki/Hyperplane). A hyperplane is defined as a subspace whose dimension is one less than the dimension of its ambient space (a hyperplane in 2D is a 1D line, a hyperplane in 3D is a 2D place, etc.). Each node is associated with an axes and represents a hyperplane that splits the subtree's search space perpendicular to its associated axis. All points on one side of this hyperplane form the left subtree, and all points on the other side form the right subtree. All nodes at the same level in a k-d tree are associated with the same axes. 
 
-The splitting planes are cycled through as we move down the levels of the tree. For example, in a 2-dimensional space, we would alternate between splitting perpendicular to the x-axis and to the y-axis at each level (Video 1)[^2]. In a 3-dimensional space, the root would be split perpendicular to the x-y and x-z planes, the children would be split perpendicular to the x-y and y-z planes, the grandchildren perpendicular to the x-z and y-z planes, the great-grandchildren again perpendiculat to the x-y and x-z planes, and so on. 
+The splitting planes are cycled through as we move down the levels of the tree. For example, in a 2-dimensional space, we would alternate between splitting perpendicular to the x-axis and to the y-axis at each level (Video 1)[^4]. In a 3-dimensional space, the root would be split perpendicular to the x-y and x-z planes, the children would be split perpendicular to the x-y and y-z planes, the grandchildren perpendicular to the x-z and y-z planes, the great-grandchildren again perpendiculat to the x-y and x-z planes, and so on. 
 
 <video id="KDTree" width="100%" frameborder="0" controls>
 <source src="{{site.baseurl}}/assets/videos/KDTreeExampleVideo.mp4" type="video/mp4"/>
@@ -200,16 +210,22 @@ The splitting planes are cycled through as we move down the levels of the tree. 
 
 Once the tree has been constructed, searching and range queries are quite simple to execute. For either type of query, we traverse the tree from the root until we reach the leaf node that would contain the query point. Then:
 
-1. For k-nearest neighbor search, all points in the leaf node's search space become the candidate points for k-nearest neighbors and each point's distance from the query point is calculated.
-If the maximum distance $$m$$ amongst the $$min(num(candidate\_points), k)$$ nearest candidate points exceeds the distance from the query point to the boundary of any neighboring subspaces (or, if a hypersphere of radius $$m$$ centered at the query point intersects with any hyperplane), then the neighboring subspace's points are also added to the candidate points set.   
-This is repeated until we have at least $$k$$ candidate points and the distance to the k-th farthest candidate point is lesser than the distance to the nearest neighboring subspace. Finally, the k-nearest candidate points are selected as the result. 
-2. For range queries within a radius $$r$$ about a query point, all points in this search space are added to the candidate points set. Points from all neighboring subspaces which are at a distance less than $$r$$ from the query point are also added to the candidate points set. Finally, all points that are at a distance less than $$r$$ from the query point are selected as the result.
+- **For k-nearest neighbor search:**
+    1. All points in the leaf node's search space become the candidate points for k-nearest neighbors and each point's distance from the query point is calculated.
+    2. If the maximum distance $$m$$ amongst the $$min(num(candidate\_points), k)$$ nearest candidate points exceeds the distance from the query point to the boundary of any neighboring subspaces (or, if a hypersphere of radius $$m$$ centered at the query point intersects with any hyperplane), then the neighboring subspace's points are also added to the candidate points set.   
+    3. This is repeated until we have at least $$k$$ candidate points and the distance to the k-th farthest candidate point is lesser than the distance to the nearest neighboring subspace. Finally, the k-nearest candidate points are selected as the result.   
+       
+- **For range queries within a radius $$r$$ about a query point:** 
+    1. All points in this search space are added to the candidate points set, and points from all neighboring subspaces which are at a distance less than $$r$$ from the query point are also added to the candidate points set. 
+    2. All points that are at a distance less than $$r$$ from the query point are selected as the result.
 
 The tree construction has a time complexity of $$O(N\log(N))$$, and the kNN and range queries have a time complexity of $$O(\log(N))$$ and $$O\left(D. n ^ {1 - \frac{1}{D}}\right)$$ respectively, where $$D$$ is the dimension of the data, which in our case is 2.
 
 As k-d trees can split the space only along the axes, they only work with [Minkowski distances](https://en.wikipedia.org/wiki/Minkowski_distance) such as Manhattan distance (L1 norm) and Euclidean distance (L2 Norm). **Unfortunately for us, the Haversine distance metric is not a Minkowski distance.** We now build upon the basic concepts of the k-d tree, and look at a data structure that does not depend on the explicit coordinates of each point, but only on the distance metric.
 
-<h4 style="margin-block-end:0.33em">The Ball Tree </h4>
+&nbsp;
+
+<h3 style="margin-block-end:0.33em">The Ball Tree </h3>
 
 A ball tree is similar to a k-d tree in that it too is a space partitioning tree data structure, but instead of using hyperplanes to partition the data it uses hyperspheres (or "balls"; a hypersphere in 2-dimensions is a circle, and a hypersphere in 3-dimensions is a sphere or a ball). A ball tree works with any metric that respects the triangle inequality:
 
@@ -227,8 +243,14 @@ At each node of the tree, we select two points in the data that have the maximum
 ><a id="note_2" style="color: inherit">**Note 2**</a>: Instead of considering the two farthest points to be the centers of the hyperspheres, we can also use the centroid of each cluster. This approach results in tighter spheres and more efficient queries, but it is not possible to use with non-Minkowski distances as computing the centroid in over them is an ill-defined problem.
 
 Nearest neighbor search and range query are very similar to those on a k-d tree: we traverse the tree and reach the lead node that would contain the query point. If the query point lies outside of either hypersphere at any level, we assign it to the hypersphere who's center is at the least distance from the query point. Then, 
-1. For k-nearest neighbor search, all points in the leaf hypersphere are now considered to be the candidate points. A minimum bounding hypersphere for the $$min(num(candidate\_points), k)$$ nearest candidate points is considered, and the points from all other hyperspheres that intersect with the minimum bounding hypersphere are added to the candidate points set. As with a k-d tree, this process is repeated until there are at least $$k$$ candidate points, and the distance to the k-th farthest candidate point is lesser than the distance to the boundary of the nearest neighboring hypersphere. The $$k$$ nearest candidate points are then selected as the result.
-2. For range queries within a radius $$r$$, all points in the leaf node's search space are added to the candidate points set. Points from all hyperspheres that intersect with the candidate points' minimum bounding hypersphere are also added to the candidate points set, and finally the points that are at a distance less than $$r$$ from the query point are selected as the result.
+- **For k-nearest neighbor search:**
+    1. All points in the leaf hypersphere are now considered to be the candidate points. 
+    2. A minimum bounding hypersphere for the $$min(num(candidate\_points), k)$$ nearest candidate points is considered, and the points from all other hyperspheres that intersect with the minimum bounding hypersphere are added to the candidate points set. 
+    3. As with a k-d tree, this process is repeated until there are at least $$k$$ candidate points, and the distance to the k-th farthest candidate point is lesser than the distance to the boundary of the nearest neighboring hypersphere. The $$k$$ nearest candidate points are then selected as the result.
+
+- **For range queries within a radius $$r$$**:
+    1. All points in the leaf node's search space are added to the candidate points set, and points from all hyperspheres that intersect with the candidate points' minimum bounding hypersphere are also added to the candidate points set.
+    2. The points that are at a distance less than $$r$$ from the query point are selected as the result.
 
 Distance from a point to a hypersphere's surface is very simple to calculate. We just calculate the distance from the point to the hypersphere's center and subtract the radius. More formally, for a hypersphere of radius $$r$$ centered at point $$center$$, the distance from a point $$query\_point$$ is defined as:
 
@@ -333,5 +355,7 @@ If you found the article and its premise interesting, here are some other intere
 
 
 ## Footnotes
-[^1]:  [Inman, James](https://en.wikipedia.org/wiki/James_Inman) (1835). [Navigation and Nautical Astronomy: For the Use of British Seamen](https://books.google.co.in/books?id=-fUOnQEACAAJ&redir_esc=y) (3 ed.). London, UK: W. Woodward, C. & J. Rivington. 
-[^2]: All videos created using [Manim Community](https://www.manim.community/).
+[^1]: [How Tinder keeps your exact location (a bit) private](https://robertheaton.com/2018/07/09/how-tinder-keeps-your-location-a-bit-private/)
+[^2]: [A list of accepted Earth radii](https://en.wikipedia.org/wiki/Earth_radius#Published_values)
+[^3]: [Inman, James](https://en.wikipedia.org/wiki/James_Inman) (1835). [Navigation and Nautical Astronomy: For the Use of British Seamen](https://books.google.co.in/books?id=-fUOnQEACAAJ&redir_esc=y) (3 ed.). London, UK: W. Woodward, C. & J. Rivington. 
+[^4]: All videos created using [Manim Community](https://www.manim.community/).
