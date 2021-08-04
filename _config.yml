@@ -1,17 +1,14 @@
 # Site settings
-title:          Tale
-description:    "Minimal Jekyll theme for storytellers"
-baseurl:        "/tale"
-url:            "https://chesterhow.github.io"
+title:          Vibhu's blog
+description:    "Vibhu Agrawal's personal blog"
+baseurl:        "/blog"
+url:            "vibhuagrawal.com"
+
+author:
+  name:       Vibhu Agrawal
 
 # Google Analytics
 google_analytics: UA—XXXXXXXX-X
-
-# Author
-author:
-  name:         Chester How
-  url:          https://chester.how
-  email:        chesterhow@gmail.com
 
 # Build settings
 markdown:       kramdown
@@ -28,14 +25,14 @@ plugins:
   - jekyll-feed
   - jekyll-paginate
   - jekyll-seo-tag
-  # - jemoji #Uncomment this to allow emoji in your post
+  - jemoji #Uncomment this to allow emoji in your post
 
 # Permalinks
-permalink:      /:year-:month-:day/:title
-paginate:       5
+permalink:      /:title
+paginate:       10
 
 # Excludes
 exclude: [ Gemfile, Gemfile.lock, tale.gemspec ]
 
 # Disqus (Set to your disqus id)
-disqus:         jekyll-tale
+disqus: 

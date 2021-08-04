@@ -1,23 +1,17 @@
 ---
 layout: default
 ---
-
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
 <div class="post">
-  <div class="post-info">
-    <span>Written by</span>
-    {% if page.author %}
-        {{ page.author }}
-    {% else %}
-        {{ site.author.name }}
-    {% endif %}
-
-    {% if page.date %}
-      <br>
-      <span>on&nbsp;</span><time datetime="{{ page.date }}">{{ page.date | date: "%B %d, %Y" }}</time>
-    {% endif %}
-  </div>
+  
 
   <h1 class="post-title">{{ page.title }}</h1>
+  <div class="post-info">
+    {% if page.date %}
+      <time datetime="{{ page.date }}">{{ page.date | date: "%B %d, %Y" }}</time>
+    {% endif %}
+  </div>
+  <br>
   <div class="post-line"></div>
 
   {{ content }}
@@ -28,12 +22,25 @@ layout: default
 {% endif %}
 
 <div class="pagination">
-  {% if page.next.url %}
+  <main style="text-align:left; width:100%">
+    <!-- <h2>Looking for opportunities!</h2> -->
+    <!-- <p>I am a graduate student at the University of Washington pursuing information management and data science. I am actively looking for internships for Summer 2022 and beyond in the data science and machine learning space. You can find my resume here and my LinkedIn profile here.</p> -->
+    <div style="text-align: center;">
+      <a href="https://www.github.com/vibhuagrawal14" target="_blank" style="color: inherit;"><i class="fa fa-github" aria-hidden="true" style="font-size:1.5em; padding:0.75em;"></i></a>
+      <a href="https://twitter.com/vibhuagrawal" target="_blank" style="color: inherit;"><i class="fa fa-twitter" aria-hidden="true" style="font-size:1.5em; padding:0.75em;"></i></a>
+      <a href="http://www.linkedin.com/in/vibhuagrawal14/" target="_blank" style="color: inherit;"><i class="fa fa-linkedin" aria-hidden="true" style="font-size:1.5em; padding:0.75em;"></i></a>
+      <a href="mailto:vibhu.agrawal14@gmail.com" target="_blank" style="color: inherit;"><i class="fa fa-envelope" aria-hidden="true" style="font-size:1.5em; padding:0.75em;"></i></a>
+      <a href="/blog/feed.xml" style="color: inherit;"><i class="fa fa-rss-square" aria-hidden="true" style="font-size:2em; padding:0.75em;"></i></a>  
+
+      <br> 
+    </div>
+  </main>
+  
+  <!-- {% if page.next.url %}
     <a href="{{ page.next.url | prepend: site.baseurl }}" class="left arrow">&#8592;</a>
   {% endif %}
   {% if page.previous.url %}
     <a href="{{ page.previous.url | prepend: site.baseurl }}" class="right arrow">&#8594;</a>
-  {% endif %}
+  {% endif %} -->
 
-  <a href="#" class="top">Top</a>
 </div>
