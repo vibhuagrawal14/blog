@@ -27,7 +27,7 @@ While it is very tempting to use the latitude/longitude data as coordinates in a
 
 ## A better distance function
 
-<a id="#note_1" style="color: inherit;">**Note 1:**</a> A key assumption here onwards is that the Earth is spherical in shape, which is not strictly true as the Earth's shape is closer to an ellipsoid with the radius of curvature at the equator being ≈6378 km and that at the poles being ≈6357 km. Because the difference in the radius is not large, the error is generally small enough to be safely ignored.
+><a id="#note_1" style="color: inherit;">**Note 1:**</a> A key assumption here onwards is that the Earth is spherical in shape, which is not strictly true as the Earth's shape is closer to an ellipsoid with the radius of curvature at the equator being ≈6378 km and that at the poles being ≈6357 km. Because the difference in the radius is not large, the error is generally small enough to be safely ignored.
 
 The shortest distance between any two points on a sphere is the distance between the two points along the great circle passing through both the points. A great circle is a circle drawn on a sphere with the same radius as the sphere, and centred at the centre of the sphere. Of the infinitely many great circles possible, we are now concerned with the one that passes through the two points in question. 
 
